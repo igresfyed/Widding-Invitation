@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Congratulations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cormorant Garamond', serif;
+            background: url('WhatsApp Image 2025-05-03 at 15.36.27_3062abfd.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .background-card {
+            padding: 10px;
+            background: rgba(255,255,255,0.85);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 98vw;
+            max-height: 98vh;
+            min-width: 320px;
+            min-height: 300px;
+            box-sizing: border-box;
+            border-radius: 18px;
+            transition: background 0.3s;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+        }
+        h2 {
+            font-family: 'Dancing Script', cursive;
+            color: #e6c200;
+            font-size: 2.2em;
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin: 12px 0 6px 0;
+            color: #8d6e53;
+            font-size: 1.1em;
+            text-align: left;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e6c20055;
+            margin-bottom: 14px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            background: #fffbe8;
+            color: #8d6e53;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus, textarea:focus {
+            border: 1.5px solid #e6c200;
+        }
+        button {
+            background: #e6c200;
+            color: #fff;
+            font-size: 1.2em;
+            padding: 10px 36px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #e6c20044;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Dancing Script', cursive;
+        }
+        button:hover {
+            background: #bfa13b;
+        }
+        .success {
+            color: #4caf50;
+            font-size: 1.2em;
+            margin-top: 18px;
+            font-family: 'Dancing Script', cursive;
+        }
+        a.back {
+            display: inline-block;
+            margin-top: 18px;
+            color: #e6c200;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1em;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-card">
+        <div class="container">
+            <h2>Send Your Congratulations</h2>
+            <form id="congrats-form">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required>
+                <label for="message">Your Message</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+                <button type="submit">Send Congratulations</button>
+            </form>
+            <div class="success" id="success-msg" style="display:none;">Your message has been sent! 🎉</div>
+            <a href="index.html" class="back">Back to Invitation</a>
+        </div>
+    </div>
+    <script>
+    document.getElementById('congrats-form').onsubmit = function(e) {
+        e.preventDefault();
+        let msgs = [];
+        try { msgs = JSON.parse(localStorage.getItem('congratsMessages')) || []; } catch {}
+        msgs.push({
+            name: document.getElementById('name').value,
+            message: document.getElementById('message').value
+        });
+        localStorage.setItem('congratsMessages', JSON.stringify(msgs));
+        document.getElementById('congrats-form').style.display = 'none';
+        document.getElementById('success-msg').style.display = 'block';
+    };
+    </script>
+</body>
+</html> 
