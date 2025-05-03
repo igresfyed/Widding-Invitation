@@ -263,12 +263,15 @@
                     JOIN US TO CELEBRATE<br>
                     OUR WEDDING<br><br>
                     OCTOBER 26, 2025 AT 7 PM<br>
-                    <a href="https://maps.app.goo.gl/Eiq97BS4Y5RnCamr5" target="_blank" style="color:#e6c200; font-weight:bold; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-                        <span style="font-size:1.2em;">📍</span> Wady Elamar
+                    <a href="https://maps.app.goo.gl/Eiq97BS4Y5RnCamr5" target="_blank"
+                       onclick="localStorage.setItem('locationClicks', (parseInt(localStorage.getItem('locationClicks')||'0')+1));"
+                       style="color:#e6c200; font-weight:bold; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                       <span style="font-size:1.2em;">📍</span> Wady Elamar
                     </a>
                     <span style="color:#fff; font-weight:bold; margin-right:8px;">Green Valley Hall</span><br>
                 </div>
                 <button id="rsvp-btn">RSVP NOW</button>
+                <a href="contact.html" style="margin-top:12px; color:#e6c200; font-family:'Dancing Script',cursive; font-size:1.1em; display:inline-block; text-decoration:none;">Send your wishes to the couple</a>
             </div>
         </div>
     </div>
@@ -328,8 +331,10 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
     document.getElementById('rsvp-btn').onclick = function() {
+        localStorage.setItem('rsvpClicks', (parseInt(localStorage.getItem('rsvpClicks')||'0')+1));
         alert('Thank you for your RSVP! We look forward to seeing you!');
     };
+    localStorage.setItem('visits', (parseInt(localStorage.getItem('visits')||'0')+1));
     </script>
 </body>
 </html>
