@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cormorant Garamond', serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .background-card {
+            padding: 10px;
+            background: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 98vw;
+            max-height: 98vh;
+            min-width: 320px;
+            min-height: 300px;
+            box-sizing: border-box;
+        }
+        .background-card > div {
+            width: 100%;
+            height: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #main-img {
+            width: 100%;
+            height: auto;
+            max-height: 90vh;
+            border-radius: 14px;
+            display: block;
+        }
+        .container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2vw 2vw;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        .names {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1.5rem, 3vw, 2.6rem);
+            color: #fff;
+            margin: 2vw 0 1vw 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: none;
+        }
+        .date {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1.1rem, 2vw, 2rem);
+            color: #fff;
+            margin: 1vw 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: none;
+        }
+        .details {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(0.9rem, 1.5vw, 1.3rem);
+            color: #fff;
+            margin: 1vw 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            line-height: 1.8;
+            font-weight: 500;
+        }
+        .main-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin: 30px 0;
+            filter: brightness(0.9);
+        }
+        .countdown-card {
+            margin: 0 auto 20px auto;
+            max-width: 600px;
+            background: transparent;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        .countdown-timer {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1rem, 2vw, 1.3em);
+            color: #e6c200;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            gap: 1vw;
+            flex-wrap: wrap;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 1vw;
+        }
+        .countdown-segment {
+            min-width: 32px;
+            margin: 0 0.2vw;
+            background: transparent;
+            padding: 0.5vw 0 0.3vw 0;
+            transition: all 0.3s ease;
+        }
+        .countdown-segment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 194, 0, 0.25);
+        }
+        .countdown-number {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1rem, 2vw, 1.3em);
+            font-weight: 700;
+            color: #e6c200;
+            display: block;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+        }
+        .countdown-label {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(0.7rem, 1vw, 0.8em);
+            color: #e6c200;
+            margin-top: 0.2vw;
+            letter-spacing: 0.5px;
+            text-transform: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+        }
+        #rsvp-btn {
+            background: #e6c200;
+            color: #fff;
+            font-size: clamp(1rem, 1.5vw, 1.2em);
+            padding: 0.7em 2em;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #e6c20044;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 1vw 0;
+        }
+        #rsvp-btn:hover {
+            background: #d4b000;
+        }
+        @media (max-width: 900px) {
+            .background-card {
+                max-width: 100vw;
+                max-height: 100vh;
+                padding: 4px;
+            }
+            .background-card > div {
+                max-width: 98vw;
+                max-height: 98vh;
+            }
+            .container {
+                padding: 2vw 1vw;
+            }
+        }
+        @media (max-width: 600px) {
+            .background-card {
+                max-width: 100vw;
+                min-width: 0;
+                padding: 2px;
+            }
+            .background-card > div {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+            .container {
+                padding: 2vw 1vw;
+            }
+            .names {
+                font-size: 1.5em;
+            }
+            .date {
+                font-size: 1.5em;
+            }
+            .countdown-timer {
+                font-size: 1em;
+                gap: 6px;
+            }
+            .countdown-segment {
+                min-width: 32px;
+                padding: 2px 0 1px 0;
+            }
+            .countdown-number {
+                font-size: 1em;
+            }
+            .countdown-label {
+                font-size: 0.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-card" id="background-card">
+        <div>
+            <img id="main-img" src="" alt="wedding">
+            <div class="container">
+                <div class="names">Ahmed & Mariam</div>
+                <div class="date">26th October</div>
+                <div class="countdown-card" id="countdown-card">
+                    <div id="countdown" class="countdown-timer"></div>
+                </div>
+                <div class="details">
+                    JOIN US TO CELEBRATE<br>
+                    OUR WEDDING<br><br>
+                    OCTOBER 26, 2024 AT 2 PM<br>
+                    123 MAPLE ST, OAK CREEK<br>
+                </div>
+                <button id="rsvp-btn">RSVP NOW</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    // Array of background images
+    const backgroundImages = [
+        'WhatsApp Image 2025-05-03 at 15.36.27_3062abfd.jpg',
+        'WhatsApp Image 2025-05-03 at 15.35.52_56df2942.jpg',
+        'WhatsApp Image 2025-05-03 at 15.35.50_34a6bc2d.jpg',
+        'WhatsApp Image 2025-05-03 at 15.35.23_5727a49e.jpg'
+    ];
+
+    // Function to set random background
+    function setRandomBackground() {
+        const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+        const randomImage = backgroundImages[randomIndex];
+        document.getElementById('main-img').src = randomImage;
+    }
+
+    // Set random background when page loads
+    window.onload = setRandomBackground;
+
+    // Classic Countdown Timer to 8 August 2024, 2:00 PM (no animation)
+    function updateCountdown() {
+        const eventDate = new Date('2024-10-26T14:00:00');
+        const now = new Date();
+        let diff = eventDate - now;
+        if (diff < 0) diff = 0;
+        // Calculate months
+        let months = (eventDate.getFullYear() - now.getFullYear()) * 12 + (eventDate.getMonth() - now.getMonth());
+        let tempDate = new Date(now.getFullYear(), now.getMonth() + months, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+        if (tempDate > eventDate) {
+            months--;
+            tempDate = new Date(now.getFullYear(), now.getMonth() + months, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+        }
+        let remaining = eventDate - tempDate;
+        let days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+        let hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        let minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        const segments = [
+            {label:'Months', value:months},
+            {label:'Days', value:days},
+            {label:'Hours', value:hours},
+            {label:'Minutes', value:minutes},
+            {label:'Seconds', value:seconds}
+        ];
+        const container = document.getElementById('countdown');
+        // Build HTML for segments
+        let html = '';
+        segments.forEach((seg,i) => {
+            html += `<div class=\"countdown-segment\"><span class=\"countdown-number\">${seg.value}</span><span class=\"countdown-label\">${seg.label}</span></div>`;
+        });
+        container.innerHTML = html;
+        months = Math.max(0, months);
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    document.getElementById('rsvp-btn').onclick = function() {
+        alert('Thank you for your RSVP! We look forward to seeing you!');
+    };
+    </script>
+</body>
+</html>
