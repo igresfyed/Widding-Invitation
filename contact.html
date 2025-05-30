@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Congratulations</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<!-- Add Firestore -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <style>
         body {
             margin: 0;
@@ -137,18 +141,26 @@
         </div>
     </div>
     <script>
-    document.getElementById('congrats-form').onsubmit = function(e) {
+    // ... Firebase config code هنا ...
+    document.getElementById('congrats-form').onsubmit = async function(e) {
         e.preventDefault();
-        let msgs = [];
-        try { msgs = JSON.parse(localStorage.getItem('congratsMessages')) || []; } catch {}
-        msgs.push({
-            name: document.getElementById('name').value,
-            message: document.getElementById('message').value
-        });
-        localStorage.setItem('congratsMessages', JSON.stringify(msgs));
-        document.getElementById('congrats-form').style.display = 'none';
-        document.getElementById('success-msg').style.display = 'block';
+        const name = document.getElementById('name').value;
+        const message = document.getElementById('message').value;
+        try {
+            await db.collection('messages').add({
+                name,
+                message,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById('congrats-form').style.display = 'none';
+            document.getElementById('success-msg').style.display = 'block';
+        } catch (err) {
+            alert('Error sending message!');
+        }
     };
+    db.collection('stats').doc('website_stats').set({
+        visits: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true });
     </script>
 </body>
 </html> 
