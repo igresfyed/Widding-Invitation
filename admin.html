@@ -5,8 +5,9 @@
     <title>Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <!-- Add Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+     
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-analytics-compat.js"></script>
     <!-- Add Leaflet for maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -200,36 +201,17 @@
 
         // Function to load messages
         function loadMessages() {
-            const messagesRef = db.collection('messages');
             const list = document.getElementById('messages-list');
-
-            // Listen for real-time updates
-            messagesRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+            db.collection('messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     list.innerHTML = "<i>No messages yet.</i>";
                     return;
                 }
-
                 list.innerHTML = snapshot.docs.map(doc => {
                     const data = doc.data();
                     return `<div class="msg">
                         <span class="name">${data.name}</span>: ${data.message}
-                        <div class="timestamp">
-                            ${new Date(data.timestamp?.toDate()).toLocaleString()}
-                            <span class="ip-address">IP: ${data.ip || 'Unknown'}</span>
-                        </div>
-                        <div class="device-info">
-                            ${data.deviceInfo ? `
-                                Browser: ${data.deviceInfo.browser.name} ${data.deviceInfo.browser.version}<br>
-                                OS: ${data.deviceInfo.os.name} ${data.deviceInfo.os.version}<br>
-                                Device: ${data.deviceInfo.device.model || 'Desktop'}
-                            ` : ''}
-                        </div>
-                        <div class="location-info">
-                            ${data.locationInfo ? `
-                                Location: ${data.locationInfo.city}, ${data.locationInfo.region}, ${data.locationInfo.country}
-                            ` : ''}
-                        </div>
+                        <div class="timestamp">${data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : ''}</div>
                     </div>`;
                 }).join('');
             });
