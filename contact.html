@@ -98,6 +98,26 @@
             font-size: 1.1em;
             text-decoration: underline;
         }
+        .admin-btn {
+            display: inline-block;
+            padding: 4px 14px;
+            font-size: 0.9em;
+            background: #e6c200;
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Dancing Script', cursive;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: background 0.2s;
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            z-index: 999;
+        }
+        .admin-btn:hover {
+            background: #bfa100;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -113,6 +133,7 @@
             </form>
             <div class="success" id="success-msg" style="display:none;">Your message has been sent! 🎉</div>
             <a href="index.html" class="back">Back to Invitation</a>
+            <a href="admin.html" class="admin-btn">Admin</a>
         </div>
     </div>
     <script>
