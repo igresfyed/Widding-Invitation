@@ -114,9 +114,41 @@
             background: #f5f5f5;
             border-radius: 4px;
         }
+        .admin-btn {
+            display: inline-block;
+            padding: 4px 14px;
+            font-size: 0.9em;
+            background: #e6c200;
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Dancing Script', cursive;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: background 0.2s;
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            z-index: 999;
+        }
+        .admin-btn:hover {
+            background: #bfa100;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
+    <script>
+        const password = "mero&ahmed123"; // Admin password
+        if (sessionStorage.getItem("admin") !== "ok") {
+            const userInput = prompt("Enter admin password:");
+            if (userInput !== password) {
+                alert("Access denied!");
+                window.location.href = "/"; // رجعه للهوم
+            } else {
+                sessionStorage.setItem("admin", "ok");
+            }
+        }
+    </script>
     <div class="admin-card">
         <h2>Admin Dashboard</h2>
         <div class="stat">Page Visits: <span id="visits">0</span></div>
@@ -139,6 +171,7 @@
             <div id="messages-list"></div>
         </div>
     </div>
+    <a href="admin.html" class="admin-btn">Admin</a>
     <script type="module">
         import { db } from './firebase-config.js';
 
