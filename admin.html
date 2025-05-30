@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-analytics-compat.js"></script>
+    <!-- Add Leaflet for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
         body {
             background: url('WhatsApp Image 2025-05-03 at 15.35.50_34a6bc2d.jpg') no-repeat center center fixed;
@@ -45,6 +52,68 @@
             font-weight: bold;
             color: #e6c200;
         }
+        .activity-log {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .activity-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.8em;
+        }
+        .ip-address {
+            color: #2196F3;
+            font-family: monospace;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+        .visitor-info {
+            margin-top: 20px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .visitor-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .visitor-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .device-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 4px;
+        }
+        .location-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 4px;
+        }
+        .visitor-map {
+            height: 300px;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .visitor-details {
+            margin-top: 8px;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -53,26 +122,193 @@
         <div class="stat">Page Visits: <span id="visits">0</span></div>
         <div class="stat">RSVP Clicks: <span id="rsvp">0</span></div>
         <div class="stat">Location Clicks: <span id="location">0</span></div>
+        
+        <div class="visitor-info">
+            <h3 style="color:#e6c200;font-family:'Dancing Script',cursive;">Recent Visitors</h3>
+            <div id="visitor-map" class="visitor-map"></div>
+            <div id="visitor-list" class="visitor-list"></div>
+        </div>
+
+        <div class="activity-log">
+            <h3 style="color:#e6c200;font-family:'Dancing Script',cursive;">Recent Activity</h3>
+            <div id="activity-list"></div>
+        </div>
+
         <div class="messages">
             <h3 style="color:#e6c200;font-family:'Dancing Script',cursive;">Messages</h3>
             <div id="messages-list"></div>
         </div>
     </div>
-    <script>
-        // Show stats
-        document.getElementById('visits').textContent = localStorage.getItem('visits') || 0;
-        document.getElementById('rsvp').textContent = localStorage.getItem('rsvpClicks') || 0;
-        document.getElementById('location').textContent = localStorage.getItem('locationClicks') || 0;
+    <script type="module">
+        import { db } from './firebase-config.js';
 
-        // Show messages
-        let msgs = [];
-        try { msgs = JSON.parse(localStorage.getItem('congratsMessages')) || []; } catch {}
-        let list = document.getElementById('messages-list');
-        if(msgs.length === 0) {
-            list.innerHTML = "<i>No messages yet.</i>";
-        } else {
-            list.innerHTML = msgs.map(m => `<div class="msg"><span class="name">${m.name}</span>: ${m.message}</div>`).join('');
+        // Initialize map
+        const map = L.map('visitor-map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const markers = new Map();
+
+        // Function to update stats
+        function updateStats() {
+            const statsRef = db.collection('stats').doc('website_stats');
+            
+            // Listen for real-time updates
+            statsRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('visits').textContent = data.visits || 0;
+                    document.getElementById('rsvp').textContent = data.rsvpClicks || 0;
+                    document.getElementById('location').textContent = data.locationClicks || 0;
+                }
+            });
         }
+
+        // Function to load messages
+        function loadMessages() {
+            const messagesRef = db.collection('messages');
+            const list = document.getElementById('messages-list');
+
+            // Listen for real-time updates
+            messagesRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    list.innerHTML = "<i>No messages yet.</i>";
+                    return;
+                }
+
+                list.innerHTML = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return `<div class="msg">
+                        <span class="name">${data.name}</span>: ${data.message}
+                        <div class="timestamp">
+                            ${new Date(data.timestamp?.toDate()).toLocaleString()}
+                            <span class="ip-address">IP: ${data.ip || 'Unknown'}</span>
+                        </div>
+                        <div class="device-info">
+                            ${data.deviceInfo ? `
+                                Browser: ${data.deviceInfo.browser.name} ${data.deviceInfo.browser.version}<br>
+                                OS: ${data.deviceInfo.os.name} ${data.deviceInfo.os.version}<br>
+                                Device: ${data.deviceInfo.device.model || 'Desktop'}
+                            ` : ''}
+                        </div>
+                        <div class="location-info">
+                            ${data.locationInfo ? `
+                                Location: ${data.locationInfo.city}, ${data.locationInfo.region}, ${data.locationInfo.country}
+                            ` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        // Function to load activity log
+        function loadActivityLog() {
+            const activityRef = db.collection('activity_log');
+            const list = document.getElementById('activity-list');
+
+            // Listen for real-time updates
+            activityRef.orderBy('timestamp', 'desc').limit(10).onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    list.innerHTML = "<i>No recent activity.</i>";
+                    return;
+                }
+
+                list.innerHTML = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return `<div class="activity-item">
+                        <div>${data.action}</div>
+                        <div class="timestamp">
+                            ${new Date(data.timestamp?.toDate()).toLocaleString()}
+                            <span class="ip-address">IP: ${data.ip || 'Unknown'}</span>
+                        </div>
+                        <div class="device-info">
+                            ${data.deviceInfo ? `
+                                Browser: ${data.deviceInfo.browser.name} ${data.deviceInfo.browser.version}<br>
+                                OS: ${data.deviceInfo.os.name} ${data.deviceInfo.os.version}<br>
+                                Device: ${data.deviceInfo.device.model || 'Desktop'}
+                            ` : ''}
+                        </div>
+                        <div class="location-info">
+                            ${data.locationInfo ? `
+                                Location: ${data.locationInfo.city}, ${data.locationInfo.region}, ${data.locationInfo.country}
+                            ` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        // Function to load unique visitors
+        function loadVisitors() {
+            const activityRef = db.collection('activity_log');
+            const list = document.getElementById('visitor-list');
+            const uniqueIPs = new Set();
+
+            // Listen for real-time updates
+            activityRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    list.innerHTML = "<i>No visitors yet.</i>";
+                    return;
+                }
+
+                const visitors = [];
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.ip && !uniqueIPs.has(data.ip)) {
+                        uniqueIPs.add(data.ip);
+                        visitors.push({
+                            ip: data.ip,
+                            deviceInfo: data.deviceInfo,
+                            locationInfo: data.locationInfo,
+                            timestamp: data.timestamp
+                        });
+
+                        // Add marker to map if location is available
+                        if (data.locationInfo && data.locationInfo.ll) {
+                            const [lat, lng] = data.locationInfo.ll;
+                            if (!markers.has(data.ip)) {
+                                const marker = L.marker([lat, lng]).addTo(map);
+                                marker.bindPopup(`
+                                    <strong>IP:</strong> ${data.ip}<br>
+                                    <strong>Location:</strong> ${data.locationInfo.city}, ${data.locationInfo.region}<br>
+                                    <strong>Device:</strong> ${data.deviceInfo?.device.model || 'Desktop'}<br>
+                                    <strong>Browser:</strong> ${data.deviceInfo?.browser.name} ${data.deviceInfo?.browser.version}
+                                `);
+                                markers.set(data.ip, marker);
+                            }
+                        }
+                    }
+                });
+
+                list.innerHTML = visitors.map(visitor => `
+                    <div class="visitor-item">
+                        <div class="ip-address">${visitor.ip}</div>
+                        <div class="visitor-details">
+                            <div class="device-info">
+                                ${visitor.deviceInfo ? `
+                                    <strong>Browser:</strong> ${visitor.deviceInfo.browser.name} ${visitor.deviceInfo.browser.version}<br>
+                                    <strong>OS:</strong> ${visitor.deviceInfo.os.name} ${visitor.deviceInfo.os.version}<br>
+                                    <strong>Device:</strong> ${visitor.deviceInfo.device.model || 'Desktop'}
+                                ` : ''}
+                            </div>
+                            <div class="location-info">
+                                ${visitor.locationInfo ? `
+                                    <strong>Location:</strong> ${visitor.locationInfo.city}, ${visitor.locationInfo.region}, ${visitor.locationInfo.country}
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="timestamp">First seen: ${new Date(visitor.timestamp?.toDate()).toLocaleString()}</div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        // Initialize the dashboard
+        updateStats();
+        loadMessages();
+        loadActivityLog();
+        loadVisitors();
     </script>
 </body>
 </html>
